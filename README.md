@@ -1,4 +1,2 @@
 # FakeImageDetector
-A notebook to apply ELA on the images and then feed them to neural network to train it.
-
-[The notebook is supposed to get the dataset from my google drive but I've uploaded the cleaned dataset here anyway. It mostly contains spliced images]
+A CNN based detector trained using compression rate variations of pristine and spliced images.
