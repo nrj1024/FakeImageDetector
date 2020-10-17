@@ -1,6 +1,4 @@
 # FakeImageDetector
-A CNN based detector trained using compression rate variations of pristine and spliced images.
+A CNN based detector and segmenter trained using compression rate variations of pristine vs spliced images and blue channel of the ELAs vs Ground Truth masks respectively.
 
-Dataset used : CASIA1
-
-** CNN for generating mask for the predicted forged region is currently being worked on. **
+Dataset used : CASIA1 | CASIA1GroundTruth
