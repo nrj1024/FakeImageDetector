@@ -10,6 +10,7 @@ import PIL.ExifTags
 import cv2 as cv
 from matplotlib import pyplot as plt
 from NeuralNets import initClassifier, initSegmenter
+from collections import defaultdict
 
 class FID:
    def __init__(self):
@@ -121,15 +122,18 @@ class FID:
       self.metadata_win.setWindowTitle("Metadata")
 
       img = PIL.Image.open(self.file_path)
-      exif={}
+      exif=exif=defaultdict(lambda : None)
 
-      for k, v in img._getexif().items():
-         if k in PIL.ExifTags.TAGS:
-            exif[PIL.ExifTags.TAGS[k]]=v
+      if img._getexif()!=None:
+         for k, v in img._getexif().items():
+            if k in PIL.ExifTags.TAGS:
+               exif[PIL.ExifTags.TAGS[k]]=v
 
-      metadata_str=''
-      for k,v in exif.items():
-         metadata_str+=str(k)+' : '+str(v)+' \n\n'
+         metadata_str=''
+         for k,v in exif.items():
+            metadata_str+=str(k)+' : '+str(v)+' \n\n'
+      else:
+         metadata_str='EXIF Data not present!'
 
       data = QTextEdit(self.metadata_win)
       data.move(20,20)
@@ -180,11 +184,12 @@ class FID:
       self.percfake.setAlignment(Qt.AlignCenter)
 
       img = PIL.Image.open(self.file_path)
-      exif={}
+      exif=defaultdict(lambda : None)
 
-      for k, v in img._getexif().items():
-         if k in PIL.ExifTags.TAGS:
-            exif[PIL.ExifTags.TAGS[k]]=v
+      if img._getexif()!=None:
+         for k, v in img._getexif().items():
+            if k in PIL.ExifTags.TAGS:
+               exif[PIL.ExifTags.TAGS[k]]=v
       self.lastus=QLabel(self.runAnalysis_win)
       self.lastus.setText('Last Used Software : \n'+str(exif['Software']))
       self.lastus.setStyleSheet('color: white; background-color: #e76f51; font-size:16px;')
