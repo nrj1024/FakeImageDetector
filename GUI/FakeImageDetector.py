@@ -11,6 +11,9 @@ import cv2 as cv
 from matplotlib import pyplot as plt
 from NeuralNets import initClassifier, initSegmenter
 from collections import defaultdict
+import pandas as pd
+from datetime import datetime
+from os import path
 
 class FID:
    def __init__(self):
@@ -35,11 +38,44 @@ class FID:
       newanalysis_bt.setCursor(QCursor(Qt.PointingHandCursor))
       newanalysis_bt.clicked.connect(self.newanalysis)
 
-      newhist_bt=QPushButton(self.win)
-      newhist_bt.setText('View History')
-      newhist_bt.move(225,240)
-      newhist_bt.setCursor(QCursor(Qt.PointingHandCursor))
-      #newhist_bt.clicked.connect(self.dummyhist)
+      hist_bt=QPushButton(self.win)
+      hist_bt.setText('View History')
+      hist_bt.move(225,240)
+      hist_bt.setCursor(QCursor(Qt.PointingHandCursor))
+      hist_bt.clicked.connect(self.showHistory)
+
+   def showHistory(self):
+      if path.exists('history.csv'):
+         history=pd.read_csv('history.csv', index_col=0)
+         self.l.setText('  Loaded history.csv')
+         hist_data=history.values
+         self.hist_win=QWidget()
+         self.hist_win.move(175,50)
+         self.hist_win.setFixedSize(800,480)
+         self.hist_win.setWindowTitle("History")
+
+         self.hist_table=QTableWidget(self.hist_win)
+         self.hist_table.resize(800,480)
+         self.hist_table.setRowCount(len(hist_data))
+         self.hist_table.setColumnCount(4)
+         self.hist_table.setHorizontalHeaderLabels(['Time Stamp', 'Image Path', '% Real', '% Fake'])
+
+         header = self.hist_table.horizontalHeader()       
+         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+         header.setSectionResizeMode(1, QHeaderView.Stretch)
+         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+
+         for i in range(len(hist_data)):
+            self.hist_table.setItem(i,0,QTableWidgetItem(hist_data[i][0]))
+            self.hist_table.setItem(i,1,QTableWidgetItem(hist_data[i][1]))
+            self.hist_table.setItem(i,2,QTableWidgetItem(str(hist_data[i][2])))
+            self.hist_table.setItem(i,3,QTableWidgetItem(str(hist_data[i][3])))
+
+         self.hist_win.show()
+
+      else:
+         self.l.setText('  history.csv does not exist!')
 
    def ovrd_dragEnterEvent(self, event):
       if event.mimeData().hasImage:
@@ -168,24 +204,27 @@ class FID:
       else:
          self.restitle.setText('FAKE')
       self.restitle.setStyleSheet('color: white; background-color: #e76f51; font-size:30px;')
-      self.restitle.setGeometry(425,95,145,60)
+      self.restitle.setGeometry(425,60,145,60)
       self.restitle.setAlignment(Qt.AlignCenter)
 
+      self.realp=str(round(result[0][0]*100,3))
+      self.fakep=str(round(result[0][1]*100,3))
+
       self.percreal=QLabel(self.runAnalysis_win)
-      self.percreal.setText(str(round(result[0][0]*100,3))+'% real')
+      self.percreal.setText(self.realp+'% real')
       self.percreal.setStyleSheet('color: white; background-color: #e76f51; font-size:16px;')
-      self.percreal.setGeometry(400,150,190,40)
+      self.percreal.setGeometry(400,115,190,40)
       self.percreal.setAlignment(Qt.AlignCenter)
 
       self.percfake=QLabel(self.runAnalysis_win)
-      self.percfake.setText(str(round(result[0][1]*100,3))+'% fake')
+      self.percfake.setText(self.fakep+'% fake')
       self.percfake.setStyleSheet('color: white; background-color: #e76f51; font-size:16px;')
-      self.percfake.setGeometry(400,180,190,40)
+      self.percfake.setGeometry(400,145,190,40)
       self.percfake.setAlignment(Qt.AlignCenter)
 
       img = PIL.Image.open(self.file_path)
       exif=defaultdict(lambda : None)
-
+      
       if img._getexif()!=None:
          for k, v in img._getexif().items():
             if k in PIL.ExifTags.TAGS:
@@ -193,15 +232,20 @@ class FID:
       self.lastus=QLabel(self.runAnalysis_win)
       self.lastus.setText('Last Used Software : \n'+str(exif['Software']))
       self.lastus.setStyleSheet('color: white; background-color: #e76f51; font-size:16px;')
-      self.lastus.setGeometry(370,250,250,80)
+      self.lastus.setGeometry(370,215,250,80)
       self.lastus.setAlignment(Qt.AlignCenter)
-
 
       genMask_bt=QPushButton(self.runAnalysis_win)
       genMask_bt.setText('Generate Mask')
-      genMask_bt.move(395,345)
+      genMask_bt.move(395,310)
       genMask_bt.setCursor(QCursor(Qt.PointingHandCursor))
       genMask_bt.clicked.connect(self.genMask)
+
+      save_bt=QPushButton(self.runAnalysis_win)
+      save_bt.setText('Save Result')
+      save_bt.move(395,365)
+      save_bt.setCursor(QCursor(Qt.PointingHandCursor))
+      save_bt.clicked.connect(self.saveResults)
 
       self.runAnalysis_win.show()
 
@@ -218,6 +262,22 @@ class FID:
       plt.figure('Binary Mask')
       plt.imshow(result, cmap='gray')
       plt.show()
+
+   def saveResults(self):
+      tstamp=datetime.now()
+      tstamp=str(tstamp)[:-7]
+      data=[[tstamp,self.file_path,self.realp,self.fakep]]
+      if path.exists('history.csv'):
+         history=pd.read_csv('history.csv', index_col=0)
+         temp=pd.DataFrame(data,columns=['Time Stamp','Image Path', '% Real', '% Fake'])
+         history=history.append(temp, ignore_index=True)
+         self.l.setText('  History file exists! Appended new data.')
+         print('History file exists! Appended new data.')
+      else:
+         history=pd.DataFrame(data,columns=['Time Stamp','Image Path', '% Real', '% Fake'])
+         self.l.setText('  History does not exist! Created new file.')
+         print('History does not exist! Created new file.')
+      history.to_csv('history.csv')
 
    def manualtools(self):
       self.manualtools_win=QWidget()
