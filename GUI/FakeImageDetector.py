@@ -69,8 +69,8 @@ class FID:
          for i in range(len(hist_data)):
             self.hist_table.setItem(i,0,QTableWidgetItem(hist_data[i][0]))
             self.hist_table.setItem(i,1,QTableWidgetItem(hist_data[i][1]))
-            self.hist_table.setItem(i,2,QTableWidgetItem(str(hist_data[i][2])))
-            self.hist_table.setItem(i,3,QTableWidgetItem(str(hist_data[i][3])))
+            self.hist_table.setItem(i,2,QTableWidgetItem(str(hist_data[i][2])[:6]))
+            self.hist_table.setItem(i,3,QTableWidgetItem(str(hist_data[i][3])[:6]))
 
          self.hist_win.show()
 
