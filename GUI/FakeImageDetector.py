@@ -184,12 +184,12 @@ class FID:
       self.runAnalysis_win.setFixedSize(640,480)
       self.runAnalysis_win.setWindowTitle("AI Analysis")
 
-      self.model=initClassifier()
-      self.model.load_weights('classifier_weights.h5')
+      classifier=initClassifier()
+      classifier.load_weights('classifier_weights.h5')
       testimg=self.convert_to_ela_image(self.file_path, 90).resize((256,256))
       test=np.array(testimg)/255
       test=test.reshape(-1,256,256,3)
-      result=self.model.predict(test)
+      result=classifier.predict(test)
       print('Chances of being real : ',round(result[0][0],3))
       print('Chances of being fake : ',round(result[0][1],3))
 
@@ -250,17 +250,17 @@ class FID:
       self.runAnalysis_win.show()
 
    def genMask(self):
-      self.model=initSegmenter()
-      self.model.load_weights('segmenter_weights.h5')
+      segmenter=initSegmenter()
+      segmenter.load_weights('segmenter_weights.h5')
       testimg=self.convert_to_ela_image(self.file_path,90).resize((256,256))
       testimg=testimg.getchannel('B')
       test=np.array(testimg)/np.max(testimg)
       test=test.reshape(-1,256,256,1)
-      result=self.model.predict(test)
-      result=result.reshape(256,256)
-      result=(result*255).astype('uint8')
+      mask=segmenter.predict(test)
+      mask=mask.reshape(256,256)
+      mask=(mask*255).astype('uint8')
       plt.figure('Binary Mask')
-      plt.imshow(result, cmap='gray')
+      plt.imshow(mask, cmap='gray')
       plt.show()
 
    def saveResults(self):
