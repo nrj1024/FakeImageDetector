@@ -22,7 +22,7 @@ class FID:
       self.win.setWindowTitle("Fake Image Detector")
       self.l=QLabel(self.win)
       self.l.setGeometry(0,462,640,18)
-      self.l.setText('   Ready!')
+      self.l.setText('  Ready!')
 
    def splashScreen(self):
       img = QLabel(self.win)
