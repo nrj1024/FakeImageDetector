@@ -20,6 +20,7 @@ class FID:
       self.win=QWidget()
       self.win.setFixedSize(640,480)
       self.win.setWindowTitle("Fake Image Detector")
+      self.win.move(320,145)
       self.l=QLabel(self.win)
       self.l.setGeometry(0,462,640,18)
       self.l.setText('  Ready!')
