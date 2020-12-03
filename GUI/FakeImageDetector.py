@@ -241,6 +241,12 @@ class FID:
       genMask_bt.move(395,310)
       genMask_bt.setCursor(QCursor(Qt.PointingHandCursor))
       genMask_bt.clicked.connect(self.genMask)
+      if result[0][0]>=0.5:
+         genMask_bt.setEnabled(False)
+         genMask_bt.setStyleSheet('color: #ffcabd; background-color: #e09987;')
+      else:
+         genMask_bt.setEnabled(True)
+         genMask_bt.setStyleSheet('color: #e76f51; background-color: white;')
 
       save_bt=QPushButton(self.runAnalysis_win)
       save_bt.setText('Save Result')
