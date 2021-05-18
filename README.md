@@ -9,3 +9,8 @@ Datasets used : CASIA1 | CASIA1GroundTruth
 - Goto GUI folder
 - Run `pip install -r requirements.txt`
 - Start the program with `python FakeImageDetector.py`
+
+For Django Web App
+- Run `pip install -r requirements.txt`
+- Start the server with `python manage.py runserver`
+- Go to `localhost:8000` in your browser.
