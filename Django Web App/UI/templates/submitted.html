@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+img {
+  display: block;
+  margin-top: 5%;
+  margin-left: auto;
+  margin-right: auto;
+}
+body {
+  background-color: #38ccbc;
+}
+h1 {
+  color: white;
+  font-family: 'PT Sans Narrow', sans-serif;
+  text-align: center;
+}
+h4 {
+  color: white;
+  font-family: 'PT Sans Narrow', sans-serif;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<img src="{% static 'check.gif' %}" alt="Confirmed" style="width:40%;">
+<h1>Your post has been submitted for analysis!</h1>
+
+<script>
+  setTimeout(function(){
+    location.replace("/");
+  }, 3000);
+</script>
+</body>
+</html>
