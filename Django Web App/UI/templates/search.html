@@ -71,6 +71,9 @@
 
     <div class="container mt-5 mb-5">
       <div class="row d-flex align-items-center justify-content-left">
+        {% if notfound %}
+          <h2 style="text-align: center; margin-top: 8%;"> Seems like there are no posts with that keyword &#128517 </h2>
+        {% endif %}
         {% for post in posts reversed%}
           <div class="col-md-6" style="width: 100%; height: auto; -webkit-box-shadow: 0px 0px 26px -3px rgba(0,0,0,0.2); 
           box-shadow: 0px 0px 26px -3px rgba(0,0,0,0.2); border-radius: 15px; padding-top: 12px; padding-bottom: 10px; margin-bottom: 40px;">
@@ -101,7 +104,7 @@
                           {% for comment in post.comments %}
                             <div id="comment{{ comment.id }}" class="d-flex flex-row mb-2"> <img src="{% static 'user.jpg' %}" class="rounded-image">
                               <div class="d-flex flex-column ml-2"> <span class="name">{{ comment.user_fullname }}</span> <small id="comment_content{{ comment.id }}" class="comment-text">{{ comment.content }}</small>
-                                  <div class="d-flex flex-row align-items-center status"> <small style="cursor:pointer;" >Like</small> <small style="cursor:pointer;" >Reply</small> <small onclick='deleteComment({{ comment.id }})' style="cursor:pointer;">Delete</small> </div>
+                                  <div class="d-flex flex-row align-items-center status"> <small style="cursor:pointer;" >Like</small> <small style="cursor:pointer;" >Reply</small> {% if comment.user == user.id %} <small onclick='deleteComment({{ comment.id }})' style="cursor:pointer;">Delete</small> {% endif %} </div>
                               </div>
                             </div>
                           {% endfor %}
@@ -116,7 +119,7 @@
           {% endfor %}
       </div>
     </div>
-    
+
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>

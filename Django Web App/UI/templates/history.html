@@ -55,7 +55,10 @@
 
     <div class="container mt-5 mb-5">
       <div class="row d-flex align-items-center justify-content-left">
-        {% for post in posts reversed%}
+        {% if posts|length == 0 %}
+          <h2 style="text-align: center; margin-top: 15%;"> Looks like you haven't posted anything &#128517 </h2>
+        {% endif %}
+        {% for post in posts reversed %}
           <div class="col-md-6" style="width: 100%; height: auto; -webkit-box-shadow: 0px 0px 26px -3px rgba(0,0,0,0.2); 
           box-shadow: 0px 0px 26px -3px rgba(0,0,0,0.2); border-radius: 15px; padding-top: 12px; padding-bottom: 10px; margin-bottom: 40px;">
               <div class="card">
@@ -85,7 +88,7 @@
                           {% for comment in post.comments %}
                             <div id="comment{{ comment.id }}" class="d-flex flex-row mb-2"> <img src="{% static 'user.jpg' %}" class="rounded-image">
                               <div class="d-flex flex-column ml-2"> <span class="name">{{ comment.user_fullname }}</span> <small id="comment_content{{ comment.id }}" class="comment-text">{{ comment.content }}</small>
-                                  <div class="d-flex flex-row align-items-center status"> <small style="cursor:pointer;" >Like</small> <small style="cursor:pointer;" >Reply</small> <small onclick='deleteComment({{ comment.id }})' style="cursor:pointer;">Delete</small> </div>
+                                  <div class="d-flex flex-row align-items-center status"> <small style="cursor:pointer;" >Like</small> <small style="cursor:pointer;" >Reply</small> {% if comment.user == user.id %} <small onclick='deleteComment({{ comment.id }})' style="cursor:pointer;">Delete</small> {% endif %} </div>
                               </div>
                             </div>
                           {% endfor %}
