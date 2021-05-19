@@ -56,8 +56,10 @@ def accountinfo(request):
     return render(request, 'account.html')
 
 def search(request):
-    if 'keyword' in request.GET and request.GET['keyword'] != ('' or ' '):
+    if 'keyword' in request.GET and request.GET['keyword'].strip() != '':
         res = Post.objects.filter(tag__icontains=request.GET['keyword'])
         posts = [PostSerializer(x).data for x in res]
+        if len(posts) == 0:
+            return render(request, 'search.html', context={'notfound':True})
         return render(request, 'search.html', context={'posts':posts})
     return render(request, 'search.html')
