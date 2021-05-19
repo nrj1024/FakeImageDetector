@@ -84,6 +84,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [permissions.AllowAny]
 
+class UserVoteDetailsViewSet(viewsets.ModelViewSet):
+    queryset = UserVoteDetails.objects.all()
+    serializer_class = UserVoteDetailsSerializer
+    permission_classes = [permissions.AllowAny]
+
 class Login(APIView):
     def post(self, request):
         user = authenticate(username=request.data['username'], password=request.data['password'])
@@ -107,6 +112,8 @@ class Register(APIView):
         new_user.first_name = request.data['first_name']
         new_user.last_name = request.data['last_name']
         new_user.save()
+        new_rel = UserVoteDetails(user=new_user)
+        new_rel.save()
         return Response({'status': 'Successfully registered new user'})
 
 class TopTags(APIView):
@@ -119,3 +126,37 @@ class TopTags(APIView):
         s_tags = sorted(atags, key = atags.count, reverse=True)
         top_tags = list(dict.fromkeys(s_tags))
         return Response(top_tags)
+
+class SaveUpvotes(APIView):
+    def post(self, request):
+        relation = UserVoteDetails.objects.get(user = request.data['user_id'])
+        post = Post.objects.get(id = request.data['post_id'])
+        relation.upvoted_posts.add(post)
+        post.votes = request.data['updated_votes']
+        post.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        relation = UserVoteDetails.objects.get(user__id = request.data['user_id'])
+        post = Post.objects.get(id = request.data['post_id'])
+        relation.upvoted_posts.remove(post)
+        post.votes = request.data['updated_votes']
+        post.save()
+        return Response(status=status.HTTP_200_OK)
+
+class SaveDownvotes(APIView):
+    def post(self, request):
+        relation = UserVoteDetails.objects.get(user__id = request.data['user_id'])
+        post = Post.objects.get(id = request.data['post_id'])
+        relation.downvoted_posts.add(post)
+        post.votes = request.data['updated_votes']
+        post.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        relation = UserVoteDetails.objects.get(user__id = request.data['user_id'])
+        post = Post.objects.get(id = request.data['post_id'])
+        relation.downvoted_posts.remove(post)
+        post.votes = request.data['updated_votes']
+        post.save()
+        return Response(status=status.HTTP_200_OK)

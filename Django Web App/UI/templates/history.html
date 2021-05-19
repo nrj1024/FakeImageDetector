@@ -82,7 +82,7 @@
                           {% for comment in post.comments %}
                             <div class="d-flex flex-row mb-2"> <img src="{% static 'user.jpg' %}" class="rounded-image">
                               <div class="d-flex flex-column ml-2"> <span class="name">{{ comment.user_fullname }}</span> <small class="comment-text">{{ comment.content }}</small>
-                                  <div class="d-flex flex-row align-items-center status">  <small>Like</small> <small>Reply</small> </div>
+                                  <div class="d-flex flex-row align-items-center status">  <small>Like</small> <small>Reply</small> <small onclick='deleteComment({{ comment.id }})' style="cursor:pointer;">Delete</small> </div>
                               </div>
                             </div>
                           {% endfor %}
@@ -115,8 +115,20 @@
         }
       }
 
-      {% for post in posts reversed%}
-        var vote{{ forloop.revcounter }} = 0;
+      {% for post in posts reversed %}
+        {% if user.id in post.upvoted_by %}
+          var vote{{ forloop.revcounter }} = 1;
+          document.getElementById("upv"+{{ forloop.revcounter }}).style.color = '#c41d31';
+          document.getElementById("dnv"+{{ forloop.revcounter }}).style.color = 'black';
+        {% elif user.id in post.downvoted_by %}
+          var vote{{ forloop.revcounter }} = -1;
+          document.getElementById("upv"+{{ forloop.revcounter }}).style.color = 'black';
+          document.getElementById("dnv"+{{ forloop.revcounter }}).style.color = '#c41d31';
+        {% else %}
+          var vote{{ forloop.revcounter }} = 0;
+          document.getElementById("upv"+{{ forloop.revcounter }}).style.color = 'black';
+          document.getElementById("dnv"+{{ forloop.revcounter }}).style.color = 'black';
+        {% endif %}
       {% endfor %}
 
       function upvote(num){
@@ -127,22 +139,56 @@
           document.getElementById("dnv"+num).style.color = 'black';
           window["vote"+num]+=1;
           document.getElementById("votes"+num).textContent = parseInt(votes) + 1;
+
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/saveupvotes/', {
+              method: "POST", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
+
         }
         else if (window["vote"+num] == 1){
           var votes = document.getElementById("votes"+num).textContent;
           document.getElementById("upv"+num).style.color = 'black';
           document.getElementById("dnv"+num).style.color = 'black';
           window["vote"+num]-=1;
-          document.getElementById("votes"+num).textContent = parseInt(votes) - 1
+          document.getElementById("votes"+num).textContent = parseInt(votes) - 1;
+
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/saveupvotes/', {
+              method: "DELETE", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
         }
+        
         else{
           var votes = document.getElementById("votes"+num).textContent;
           document.getElementById("upv"+num).style.color = 'black';
           document.getElementById("dnv"+num).style.color = 'black';
           window["vote"+num]+=1;
-          document.getElementById("votes"+num).textContent = parseInt(votes) + 1
-        }
+          document.getElementById("votes"+num).textContent = parseInt(votes) + 1;
 
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/savedownvotes/', {
+              method: "DELETE", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
+        }
       }
 
       function downvote(num){
@@ -153,20 +199,55 @@
           document.getElementById("upv"+num).style.color = 'black';
           window["vote"+num]-=1;
           document.getElementById("votes"+num).textContent = parseInt(votes) - 1;
-        }
+
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/savedownvotes/', {
+              method: "POST", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
+          }
+        
         else if (window["vote"+num] == -1){
           var votes = document.getElementById("votes"+num).textContent;
           document.getElementById("dnv"+num).style.color = 'black';
           document.getElementById("upv"+num).style.color = 'black';
           window["vote"+num]+=1;
           document.getElementById("votes"+num).textContent = parseInt(votes) + 1
-        }
+
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/savedownvotes/', {
+              method: "DELETE", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
+          }
+        
         else{
           var votes = document.getElementById("votes"+num).textContent;
           document.getElementById("dnv"+num).style.color = 'black';
           document.getElementById("upv"+num).style.color = 'black';
           window["vote"+num]-=1;
-          document.getElementById("votes"+num).textContent = parseInt(votes) - 1
+          document.getElementById("votes"+num).textContent = parseInt(votes) - 1;
+
+          var votes_updated = document.getElementById("votes"+num).textContent;
+          const vote_request = new Request('http://localhost:8000/api/saveupvotes/', {
+              method: "DELETE", 
+              body: '{"user_id":{{ user.id }}, "post_id":'+num+', "updated_votes":'+votes_updated+'}',
+              headers: {"Content-type": "application/json; charset=UTF-8", 'X-CSRFToken': Cookies.get('csrftoken')}
+            });
+
+          fetch(vote_request)
+          .then(response => response.json())
+          .catch(error => console.log(error));
         }
 
       }
@@ -174,7 +255,7 @@
       function submitComment(num){
         if (document.getElementById("commentText"+num).value != '' && document.getElementById("commentText"+num).value != ' '){
             var comment = document.getElementById("commentText"+num).value
-            var CommentTemplate = '<div class="d-flex flex-row mb-2"> <img src="/static/user.jpg" class="rounded-image"> <div class="d-flex flex-column ml-2"> <span class="name">{{ user.get_full_name }}</span> <small class="comment-text">'+comment+'</small> <div class="d-flex flex-row align-items-center status"> <small>Like</small> <small>Reply</small> <small>Translate</small> </div> </div> </div>'
+            var CommentTemplate = '<div class="d-flex flex-row mb-2"> <img src="/static/user.jpg" class="rounded-image"> <div class="d-flex flex-column ml-2"> <span class="name">{{ user.get_full_name }}</span> <small class="comment-text">'+comment+'</small> <div class="d-flex flex-row align-items-center status"> <small>Like</small> <small>Reply</small> <small>Delete</small> </div> </div> </div>'
             var node = document.createRange().createContextualFragment(CommentTemplate);
             var CommentArea = document.getElementById("commentDiv"+num);
             
@@ -194,6 +275,10 @@
             .catch(error => console.log(error));
 
         }
+      }
+
+      function deleteComment(num){
+        
       }
 
       function lgpanel(){

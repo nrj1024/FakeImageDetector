@@ -16,3 +16,8 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     content = models.CharField(max_length=500)
     created_on = models.DateTimeField(auto_now=True)
+
+class UserVoteDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vote_details')
+    upvoted_posts = models.ManyToManyField(Post, related_name='upvoted_by')
+    downvoted_posts = models.ManyToManyField(Post, related_name='downvoted_by')
