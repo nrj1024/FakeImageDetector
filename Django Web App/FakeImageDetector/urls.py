@@ -25,7 +25,3 @@ urlpatterns = [
     path('api/', include('mainapp.urls')),
     path('', include('UI.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-if not settings.DEBUG:
-    urlpatterns += [ re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
-                     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}) ]
