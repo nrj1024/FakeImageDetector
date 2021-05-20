@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from time import sleep
 from django.template.response import TemplateResponse
+from django.contrib import messages
 
 def home(request):
     if not request.user.is_authenticated:
@@ -17,6 +18,10 @@ def home(request):
 def signin(request):
     if request.method == 'POST':
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+        if user == None:
+            messages.add_message(request, messages.ERROR, 'Invalid Credentials!')
+            print('Invalid Credentials!')
+            return render(request, 'signin.html')
         login(request, user)
         print('Logged in', request.user.username)
         return redirect('/')
