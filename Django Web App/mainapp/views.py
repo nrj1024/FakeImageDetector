@@ -114,8 +114,7 @@ class Register(APIView):
         new_user.first_name = request.data['first_name']
         new_user.last_name = request.data['last_name']
         new_user.save()
-        new_rel = UserVoteDetails(user=new_user)
-        new_rel.save()
+        UserVoteDetails.objects.create(user=new_user)
         return Response({'status': 'Successfully registered new user'})
 
 class TopTags(APIView):
@@ -127,7 +126,7 @@ class TopTags(APIView):
         atags = [x.strip() for x in tags.split(',')][:-1]
         s_tags = sorted(atags, key = atags.count, reverse=True)
         top_tags = list(dict.fromkeys(s_tags))
-        return Response(top_tags)
+        return Response(top_tags[:15])
 
 class SaveUpvotes(APIView):
     def post(self, request):

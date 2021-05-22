@@ -11,7 +11,10 @@ from django.contrib import messages
 def home(request):
     if not request.user.is_authenticated:
         return redirect('/signin/')
-    posts = requests.get('http://localhost:8000/api/posts?ordering=votes').json()
+    if 'sort' in request.GET:
+        posts = requests.get('http://localhost:8000/api/posts?ordering='+request.GET['sort']).json()
+    else:
+        posts = requests.get('http://localhost:8000/api/posts?ordering=votes').json()
     return render(request, 'headers.html', context={'posts':posts})
 
 def signin(request):
@@ -34,6 +37,7 @@ def register(request):
         user.first_name = request.POST['firstname']
         user.last_name = request.POST['lastname']
         user.save()
+        UserVoteDetails.objects.create(user=user)
         return render(request, 'registered.html')
     return render(request, 'register.html')
 
