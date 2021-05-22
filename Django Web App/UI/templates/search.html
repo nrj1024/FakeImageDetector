@@ -97,7 +97,7 @@
                       <hr>
                       <div class="d-flex justify-content-between align-items-center">
                           <div class="d-flex flex-row icons d-flex align-items-center"> <i style="cursor: pointer;" id="upv{{ post.id }}" onclick="upvote({{ post.id }})" class="fas fa-chevron-up"></i>&nbsp&nbsp&nbsp<i style="cursor: pointer;" id="dnv{{ post.id }}" onclick="downvote({{ post.id }})" class="fas fa-chevron-down"></i>&nbsp&nbsp&nbsp<span id="votes{{ post.id }}">{{ post.votes }}</span> </div>
-                          <div class="d-flex flex-row muted-color"> <span id="nos_comment{{ post.id }}" >{{ post.comments|length }}</span> <span>&nbspcomments &nbsp&nbsp&nbsp</span> <span class="ml-2">Share</span> </div>
+                          <div class="d-flex flex-row muted-color"> <span id="nos_comment{{ post.id }}" >{{ post.comments|length }}</span> <span>&nbspcomments &nbsp&nbsp&nbsp</span> <span class="ml-2" style="cursor: pointer;" onclick="navigator.share(shareData{{ post.id }})" >Share</span> </div>
                       </div>
                       <hr>
                       <div id="commentDiv{{ post.id }}" class="comments">
@@ -126,6 +126,11 @@
     <script>
 
       {% for post in posts reversed %}
+        var shareData{{ post.id }} = {
+                          title: 'Fake Image Detector',
+                          text: 'Watch the truth about this image on FID ! ',
+                          url: 'http://localhost:8000/post/{{ post.id }}',
+                        }
         {% if user.id in post.upvoted_by %}
           var vote{{ post.id }} = 1;
           document.getElementById("upv"+{{ post.id }}).style.color = '#c41d31';

@@ -9,5 +9,6 @@ urlpatterns = [
     path('analyze/', analyze),
     path('history/', history),
     path('account/', accountinfo),
-    path('search/', search)
+    path('search/', search),
+    path('post/<int:post_id>', post)
 ]

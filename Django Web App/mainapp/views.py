@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, filters
 from mainapp.models import *
 from mainapp.serializers import *
 from mainapp.NeuralNets import initClassifier, initSegmenter
@@ -78,6 +78,8 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_on', 'votes']
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
